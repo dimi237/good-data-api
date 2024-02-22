@@ -1,4 +1,4 @@
-export * from './users.route2';
+export * from './users.route';
 
 export * from './users.controller';
 

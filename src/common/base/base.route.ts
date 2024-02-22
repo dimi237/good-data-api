@@ -1,14 +1,14 @@
+import 'reflect-metadata';
 import express from 'express';
 import { BaseController } from './base.controller';
 import { BaseModel } from '..';
-import { Service } from 'typedi';
-
-type ControllerType<T, M> = T extends BaseController<M extends BaseModel ? M : any> ? T : any; 
+import { Inject, Service } from 'typedi';
+import { UsersController } from 'modules/users';
 
 @Service()
-export abstract class BaseRouter<T, M> {
-
-    constructor(public controller: ControllerType<T, M> ) { }
+export abstract class BaseRouter {
+    @Inject()
+    controller: UsersController;
 
     getRouter = (middleware?: any) => {
         const router = express.Router();

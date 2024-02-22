@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Express } from 'express';
-import usersRoute from 'modules/users/users.route2';
+import usersRoute from 'modules/users/users.route';
 import authRoute from 'modules/auth/auth.route';
 import notificationsRoute from 'modules/notifications/notifications.route';
 
