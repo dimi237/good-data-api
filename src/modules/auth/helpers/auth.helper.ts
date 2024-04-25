@@ -2,6 +2,7 @@ import moment from "moment";
 import jwt from 'jsonwebtoken';
 import { Token } from "../models";
 import { config } from 'convict-config';
+import { CommonService } from "common/services/common.service";
 
 export const create = (payload: any): Token => {
     const issued = getCurrDateSeconds();
@@ -10,20 +11,9 @@ export const create = (payload: any): Token => {
 
     const access_token = jwt.sign({ payload }, `${config.get('tokenSalt')}`, options);
 
-    const refresh_token = jwt.sign({ payload }, `${config.get('tokenSalt')}`, options);
+    const refresh_token = jwt.sign({ payload: { payload } }, `${config.get('tokenSalt')}`, options);
 
     return { access_token, refresh_token, token_type: 'Bearer', issued, expires_in: ttl }
-}
-
-export const refresh = (token: string): any => {
-    const payload: any = jwt.verify(token, `${config.get('tokenSalt')}`);
-    delete payload.iat;
-    delete payload.exp;
-    delete payload.nbf;
-
-    const options = { expiresIn: `99999999999999` };
-
-    return jwt.sign({ payload }, `${config.get('tokenSalt')}`, options);
 }
 
 const getCurrDateSeconds = (): number => {

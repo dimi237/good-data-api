@@ -3,7 +3,6 @@ import { UsersController } from './users.controller';
 import { User } from './models';
 import { userMiddleware } from './middleware';
 import { BaseRouter } from 'common/base/base.route';
-import express from 'express';
 
 
 @Service()

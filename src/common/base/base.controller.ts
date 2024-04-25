@@ -5,12 +5,15 @@ import { logger } from "winston-config";
 import { BaseModel } from 'common/interfaces/model.interface';
 import { Service } from 'typedi';
 
-// @Service()
-export  class BaseController<T extends BaseModel> implements controllerInterface {
+
+type ServiceType<T> = T extends BaseService<T extends BaseModel ? T : any> ? T : any;
+
+@Service()
+export class BaseController<T extends BaseModel> implements controllerInterface {
 
   protected logger;
 
-  constructor(protected readonly service: BaseService<T>) {
+  constructor(protected readonly service: ServiceType<T>) {
     this.logger = logger;
   }
 
@@ -35,13 +38,28 @@ export  class BaseController<T extends BaseModel> implements controllerInterface
     catch (error) { next(error); }
   }
 
+  async deleteById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try { res.send(await this.service.deleteById(req.params.id)); }
+    catch (error) { next(error); }
+  }
+
   async count(req: Request, res: Response, next: NextFunction): Promise<void> {
     try { res.send(await this.service.count(req.query)); }
     catch (error) { next(error); }
   }
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try { res.send(await this.service.update(req.query, req.body)); }
+    try { res.send(await this.service.update({ _id: req.params.id }, req.body)); }
+    catch (error) { next(error); }
+  }
+
+  async enable(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try { res.send(await this.service.enable(req.params.id, req.body)); }
+    catch (error) { next(error); }
+  }
+
+  async disable(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try { res.send(await this.service.disable(req.params.id, req.body)); }
     catch (error) { next(error); }
   }
 

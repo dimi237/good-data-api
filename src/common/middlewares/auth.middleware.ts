@@ -8,6 +8,9 @@ export const whiteList: { path: string, method?: string }[] = [
     { path: '/auth/login', method: 'POST' },
     { path: '/auth/refresh', method: 'POST' },
     { path: '/auth/register', method: 'POST' },
+    { path: '/public', method: 'GET' },
+    { path: '/programs', method: 'GET' },
+    { path: '/inscription', method: 'POST' },
 ];
 
 export  function authVerification(req: Request, res: Response, next: NextFunction) {
@@ -30,8 +33,7 @@ export  function authVerification(req: Request, res: Response, next: NextFunctio
         const user = payloadata.payload;
         httpContext.set('user', user);
 
-        next();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return next();
     } catch (error: any) {
         if (error.message === 'TokenExpired') {
             logger.error(`\nToken expired.`, error);

@@ -10,7 +10,7 @@ class AuthenticationRouter {
         const router = express.Router();
         router.post('/login', validateLoginMiddleware, (req: Request, res: Response, next: NextFunction) => this.authController.login(req, res, next));
         router.post('/register', validateRegisterMiddleware, (req: Request, res: Response, next: NextFunction) => this.authController.register(req, res, next));
-        router.get('/refresh', (req: Request, res: Response, next: NextFunction) => this.authController.refresh(req, res, next));
+        router.post('/refresh', (req: Request, res: Response, next: NextFunction) => this.authController.refresh(req, res, next));
         return router
     }
 }

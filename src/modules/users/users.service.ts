@@ -1,10 +1,11 @@
 import { isEmpty } from "lodash";
-import { User } from "./models";
+import { User, UserCategory } from "./models";
 import { UsersRepository } from "./users.repository";
-import { BaseService } from "common";
+import { BaseService, errorMsg } from "common";
 import { Service } from "typedi";
 import { hash } from "bcrypt";
 import { config } from "convict-config"
+import moment from "moment";
 
 
 @Service()
@@ -22,16 +23,24 @@ export class UsersService extends BaseService<User> {
 
     async createUser(user: User) {
         try {
-            const { email } = user;
+            const { email, username } = user;
 
             delete user._id;
             const existing = await this.userRepository.findOne({ filter: { email } });
 
-            if (!isEmpty(existing)) { return new Error('EmailAllreadyUsed'); }
+            if (!isEmpty(existing)) { throw new Error(errorMsg.EMAIL_USED); }
 
-            const { password } = user;
+            const existingUsername = await this.userRepository.findOne({ filter: { username } });
+
+            if (!isEmpty(existingUsername)) { throw new Error(errorMsg.USERNAME_USED); }
+
+            const password = '123';
 
             user.password = await hash(password, config.get('saltRounds'));
+
+            user.category = UserCategory.ADMIN;
+            
+            user.dates = { created: moment().valueOf() };
 
             const result = await this.userRepository.create(user as any);
 

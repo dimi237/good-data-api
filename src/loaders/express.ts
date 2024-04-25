@@ -1,6 +1,6 @@
 import { logger, morganOption } from "winston-config";
 import { ErrorHandler, authVerification } from "common/middlewares";
-import { json, urlencoded } from 'body-parser';
+import bodyParser, { json, urlencoded } from 'body-parser';
 import  httpContext from 'express-http-context';
 import { config } from 'convict-config';
 import compression from 'compression';
@@ -38,11 +38,14 @@ export class ExpressLoader {
         app.use(json({ limit: "20mb" }));
 
         // enabling CORS for all requests
-        app.use(cors({ origin: true, credentials: true }));
+        app.use(cors({}));
 
+        app.use(bodyParser.json()); //must come before
+
+        
         // Apply middlewares
         app.use(httpContext.middleware);
-        // app.use(authVerification);
+        app.use(authVerification);
 
         // Pass app to routes
         routes(app);
@@ -52,7 +55,7 @@ export class ExpressLoader {
 
         // set base API path
         const main = express().use(config.get('basePath') || '', app);
-
+       
         // Start application
         this.server = main.listen(config.get('port'), config.get('host'), () => {
             logger.info(`${config.get('host')} server started. Listening on port ${config.get('port')} in "${config.get('env')}" mode`);

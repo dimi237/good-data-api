@@ -7,29 +7,33 @@ export class User implements BaseModel {
     fname: string;
     lname: string;
     email: string;
+    tel: string;
     password: string;
     category: UserCategory
-    token?: string;
-    studentProfile?: StudentProfile;
+    token?: TokenData;
+    profile?: Profile;
     connectionHistory: ConnectionHistory[];
     dates?: {
         created: number;
         updated?: number;
     }
+    enabled?: boolean;
 
-    constructor(fname: string, lname: string, username: string, email: string, password: string, category: UserCategory, studentProfile?: StudentProfile) {
+    constructor(fname: string, lname: string, username: string, email: string, tel: string, password: string, category: UserCategory, profile?: Profile) {
         this.fname = fname;
         this.lname = lname;
         this.username = username;
         this.email = email;
+        this.tel = tel;
         this.password = password;
         this.category = category;
         this.dates = {
             created: moment().valueOf(),
         }
-        if (studentProfile) {
-            this.studentProfile = studentProfile;
+        if (profile) {
+            this.profile = profile;
         }
+        this.enabled = true;
     }
 
 
@@ -48,13 +52,17 @@ export interface ConnectionHistory {
 
 export enum UserCategory {
     ADMIN = 100,
-    STUDENT = 200
+    USER = 200
 }
 
 
-export type StudentProfile = {
-    level: string;
-    school: string;
+export type Profile = {
+    profession: string;
     field: string;
-    year: number;
+}
+
+export type TokenData = {
+    refreshToken: string;
+    accessToken: string;
+    expiresIn: number;
 }

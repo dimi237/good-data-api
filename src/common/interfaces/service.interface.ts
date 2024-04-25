@@ -10,7 +10,7 @@ export interface ServiceInterface {
 
     count(query: QueryFilter): Promise<number | QueryResult>;
 
-    update(filter: QueryFilter, data: Document): Promise<QueryResult>;
+    update(filter: QueryFilter, data: Document, push: any): Promise<QueryResult>;
 
 }
 

@@ -10,7 +10,7 @@ export interface RepositoryInterface {
 
     count(query: QueryFilter): Promise<number>;
 
-    update(filter: QueryFilter, data: Document): Promise<UpdateResult>;
+    update(filter: QueryFilter, data: Document, push: any): Promise<UpdateResult>;
 }
 
 

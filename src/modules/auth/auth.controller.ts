@@ -11,7 +11,7 @@ export class AuthController {
     }
 
     async login(req: Request, res: Response, next: NextFunction) {
-        try { res.send(await this.authService.login(req.body)); }
+        try { res.send(await this.authService.login(req.body, { ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress, location: req.headers['location'] })); }
         catch (error) { next(error); }
     }
 

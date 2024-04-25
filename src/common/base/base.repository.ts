@@ -1,4 +1,4 @@
-import { Collection, Document, InsertOneResult, ObjectId, UpdateResult, WithId } from 'mongodb';
+import { Collection, DeleteResult, Document, InsertOneResult, ObjectId, UpdateResult, WithId } from 'mongodb';
 import { RepositoryInterface } from '../interfaces';
 import * as db from 'database/mongodb';
 import { Service } from "typedi";
@@ -57,11 +57,17 @@ export class BaseRepository implements RepositoryInterface {
     } catch (error) { throw (error); }
   }
 
-  async update(filter: QueryFilter, document: Document): Promise<UpdateResult> {
+  async update(filter: QueryFilter, document: Document, push?: any): Promise<UpdateResult> {
     try {
       this.setMongoId(filter);
-
       return (await this.getCollection()).updateOne(filter, { $set: document });
+    } catch (error) { throw (error); }
+  }
+
+
+  async delete(id: string): Promise<DeleteResult> {
+    try {
+      return (await this.getCollection()).deleteOne({ _id: new ObjectId(id) });
     } catch (error) { throw (error); }
   }
 
@@ -88,7 +94,7 @@ export class BaseRepository implements RepositoryInterface {
   }
 
   private setMongoId(filter: QueryFilter): void {
-    if ('_id' in filter)
+    if (filter['_id'])
       filter._id = new ObjectId(filter._id.toString());
   }
 }
