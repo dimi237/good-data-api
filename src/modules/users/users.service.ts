@@ -6,12 +6,14 @@ import { Service } from "typedi";
 import { hash } from "bcrypt";
 import { config } from "convict-config"
 import moment from "moment";
+import { NotificationsService, TemplateLabel } from "modules/notifications";
 
 
 @Service()
 export class UsersService extends BaseService<User> {
 
-    constructor(private readonly userRepository: UsersRepository) {
+    constructor(private readonly userRepository: UsersRepository,
+        private readonly notificationsService: NotificationsService) {
         super(userRepository);
     }
 
@@ -39,13 +41,12 @@ export class UsersService extends BaseService<User> {
             user.password = await hash(password, config.get('saltRounds'));
 
             user.category = UserCategory.ADMIN;
-            
+
             user.dates = { created: moment().valueOf() };
 
             const result = await this.userRepository.create(user as any);
-
+            // await this.notificationsService.sendEmailNotification(email, TemplateLabel.ADMIN_CREATED_TO_USER, { user, password });
             const data = { _id: result.insertedId };
-
             return data;
         }
         catch (error) { throw (error); }

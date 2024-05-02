@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.10.4",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
@@ -22,6 +23,8 @@
     "express": "^4.19.2",
     "express-http-context": "^1.2.4",
     "express-xml-bodyparser": "^0.3.0",
+    "fs-readfile-promise": "^3.0.1",
+    "handlebars": "^4.7.8",
     "helmet": "^7.1.0",
     "inquirer": "^9.2.15",
     "joi": "^17.12.1",
@@ -42,11 +45,13 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.5",
     "@types/bcrypt": "^5.0.2",
     "@types/compression": "^1.7.5",
     "@types/convict": "^6.1.6",
     "@types/cors": "^2.8.17",
     "@types/crypto-js": "^4.2.2",
+    "@types/fs-readfile-promise": "^3.0.4",
     "@types/inquirer": "^9.0.7",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/lodash": "^4.14.202",
