@@ -1,0 +1,23 @@
+{
+    "env": "production",
+    "ip": "127.0.0.1",
+    "port": 3000,
+    "host": "localhost",
+    "db": {
+        "host": "host.docker.internal:27017",
+        "name": "good-data",
+        "auth": {
+            "user": "",
+            "password": ""
+        }
+    },
+    "baseUrl": "http://localhost:8000",
+    "basePath": "/api/v0",
+    "filePath": "uploads",
+    "tokenTTL": 3600,
+    "tokenSalt": "5dG8@3!Dtder",
+    "amqp": {
+        "host": "amqp://localhost",
+        "secret": "fe@c/VW'4mK)6Gtd"
+    }
+}

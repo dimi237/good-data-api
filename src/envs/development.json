@@ -1,0 +1,27 @@
+{
+    "env": "development",
+    "ip": "127.0.0.1",
+    "port": 7001,
+    "host": "localhost",
+    "app": {
+        "url": "http:localhost:4200",
+        "logo": "https://gooddata.fr-par-1.linodeobjects.com/logo.png"
+    },
+    "db": {
+        "host": "127.0.0.1:27017",
+        "name": "good-data",
+        "auth": {
+            "user": "",
+            "password": ""
+        }
+    },
+    "baseUrl": "http://localhost:8000",
+    "basePath": "/api/v0",
+    "filePath": "uploads",
+    "tokenTTL": 3600,
+    "tokenSalt": "5dG8@3!Dtder",
+    "amqp": {
+        "host": "amqp://localhost",
+        "secret": "fe@c/VW'4mK)6Gtd"
+    }
+}

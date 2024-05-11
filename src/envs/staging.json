@@ -1,0 +1,16 @@
+{
+    "env": "staging",
+    "ip": "127.0.0.1",
+    "port": 3000,
+    "host": "localhost",
+    "db": {
+        "host": "127.0.0.1:27017",
+        "name": "good-data",
+        "auth": {
+            "user": "",
+            "password": ""
+        }
+    },
+    "baseUrl": "http://localhost:8000",
+    "basePath": "/api/v0"
+}
