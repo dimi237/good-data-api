@@ -8,12 +8,6 @@ export const config = convict({
         default: 'development',
         env: 'NODE_ENV'
     },
-    ip: {
-        doc: 'The IP address to bind.',
-        format: String,
-        default: '127.0.0.1',
-        env: 'IP_ADDRESS',
-    },
     port: {
         doc: 'The port to bind.',
         format: 'port',
