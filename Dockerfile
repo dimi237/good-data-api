@@ -20,7 +20,7 @@ ADD package.json /usr/src/good-data
 
 # Install dependecies
 RUN npm install -g typescript ts-node
-RUN npm install --only=production --unsafe-perm=true
+RUN npm install --unsafe-perm=true
 
 # Get all the code needed to run the app
 ADD . /usr/src/good-data
