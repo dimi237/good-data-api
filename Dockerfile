@@ -32,6 +32,6 @@ COPY src/modules/notifications/templates /usr/src/good-data-api/src/modules/noti
 
 WORKDIR  /usr/src/good-data-api
 
-EXPOSE 7000
+EXPOSE 3000
 
 CMD ["npm", "run", "start:prod"]
