@@ -20,7 +20,7 @@
       "src/common/types",
       "node_modules/@types"
     ],                                  
-    "sourceMap": true,                             
+    "sourceMap": true,    
     "outDir": "./dist",                             
     "esModuleInterop": true, 
     "forceConsistentCasingInFileNames": true, 

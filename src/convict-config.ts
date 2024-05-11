@@ -75,12 +75,26 @@ export const config = convict({
         format: String,
         default: ''
     },
+    app: {
+        url: {
+            doc: 'App url',
+            format: '*',
+            default: 'http://localhost:4200',
+            env: 'APP_URL'
+        },
+        logo: {
+            doc: 'App logo',
+            format: '*',
+            default: '',
+            env: 'APP_LOGO'
+        },
+    },
 
     db: {
         host: {
             doc: 'Database host name/IP',
             format: '*',
-            default: '127.0.0.1:27017',
+            default: '',
             env: 'DB_MONGO_HOST'
         },
         name: {
@@ -124,7 +138,8 @@ export const config = convict({
     filePath: {
         doc: 'path to store files.',
         format: String,
-        default: ''
+        default: 'uploads',
+        env: 'FILE_PATH'
     },
 
 

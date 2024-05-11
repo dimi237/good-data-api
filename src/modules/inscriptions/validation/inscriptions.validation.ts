@@ -9,8 +9,6 @@ export const validateCreateInscription = (inscription: Inscription): ValidationR
         email: Joi.string().required(),
         level: Joi.string().required(),
         situation: Joi.string().required(),
-        location: Joi.string().required(),
-
     });
 
     return schema.validate(inscription);

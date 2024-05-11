@@ -12,9 +12,7 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9)
-        const user = httpContext.get('user');
-        const { username } = user;
-        cb(null, username + '_' + camelCase(req.body.name) + '_' + uniqueSuffix + '_' + file?.originalname)
+        cb(null, camelCase(req.body.name) + '_' + uniqueSuffix + '_' + file?.originalname)
     }
 })
 const upload = multer({ storage: storage })

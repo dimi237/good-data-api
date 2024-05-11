@@ -1,46 +1,39 @@
-import inquirer from 'inquirer'
-import { logger } from './winston-config';
+import { hash } from 'bcrypt';
 import { getDatabase } from './database';
 import { isEmpty } from 'lodash';
-import { hash } from 'bcrypt';
-import { config } from './convict-config';
 import moment from 'moment';
-import { UserCategory } from 'modules/users';
-import { errorMsg } from 'common/utils';
+import config from './convict-config';
 
 (async () => {
-    const db = await getDatabase();
+	const db = await getDatabase();
+	const users = [
+		{ 
+		username: "ADMIN001",
+		fname: "Gerbauld",
+		lname: "Tango",
+		email: "tangogerbauld@gmail.com",
+		tel: "237690364920",
+		password: await hash('goodData2024', config.get('saltRounds')),
+		category: 100,
+		enabled: true, 
+		dates: { created: moment().valueOf(), updated: null } 
+	},
+	]
+	try {
+	  
 
-    const qestions = [
-        { type: 'input', name: 'email', message: 'The email of the user?' },
-        { type: 'input', name: 'username', message: 'The name of the user?' },
-        { type: 'input', name: 'fname', message: 'The password of the user?' },
-        { type: 'input', name: 'lname', message: 'The password of the user?' },
-        { type: 'input', name: 'clearPassword', message: 'The password of the user?' },
-        { type: 'input', name: 'clearPassword', message: 'The password of the user?' },
-    ]
-    try {
-        const answers = await inquirer.prompt(qestions);
-        const { email, clearPassword } = answers;
-        const existing = db.collection('users').findOne({ email });
+		if (isEmpty(users)) { return; }
 
-        if (!isEmpty(existing)) {
-            logger.error('Email allready used');
-            return new Error(errorMsg.EMAIL_USED);
-        }
-        const password = await hash(clearPassword, config.get('saltRounds'));
-        delete answers.clearPassword;
-        const user = { ...answers, password, dates: { created: moment().valueOf() }, category: UserCategory.ADMIN }
-        const result = await db.collection('users').insertOne(user);
+		const result = await db.collection('users').insertMany(users);
 
-        if (result instanceof Error) { return result; }
+		if (result instanceof Error) { return result; }
 
-        console.log(`User ${name} created successfully`)
-    } catch (error: any) {
-        console.log(error)
-    } finally {
-        process.exit();
-    }
+		console.log(`users created successfully`)
+	} catch (error: any) {
+		console.log(error)
+	} finally {
+		process.exit();
+	}
 
 
 })()

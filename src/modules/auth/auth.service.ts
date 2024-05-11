@@ -8,13 +8,16 @@ import { config } from 'convict-config';
 import { errorMsg } from "common/utils";
 import { isEmpty } from "lodash";
 import moment from "moment";
+import { NotificationsService, TemplateLabel } from "modules/notifications";
 
 
 
 @Service()
 export class AuthService {
 
-    constructor(private readonly userService: UsersService) { }
+    constructor(private readonly userService: UsersService,
+        private notificationsService: NotificationsService
+    ) { }
 
     async login(credentials: Credentials, metadata: any): Promise<any> {
         try {
@@ -52,8 +55,8 @@ export class AuthService {
 
             if (!isEmpty(existingUsername)) { throw new Error(errorMsg.USERNAME_USED); }
 
-
             const savedUser = await this.userService.create(createdUser);
+            await this.notificationsService.sendEmailNotification(email, TemplateLabel.INSCRIPTION_TO_USER,user);
             return savedUser;
         } catch (error: any) {
             throw (error);

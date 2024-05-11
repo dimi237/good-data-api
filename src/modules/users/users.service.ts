@@ -7,6 +7,7 @@ import { hash } from "bcrypt";
 import { config } from "convict-config"
 import moment from "moment";
 import { NotificationsService, TemplateLabel } from "modules/notifications";
+import { CommonService } from "common/services/common.service";
 
 
 @Service()
@@ -22,6 +23,10 @@ export class UsersService extends BaseService<User> {
         catch (error) { throw (error); }
     }
 
+    async getAdminUsers() {
+        try { return await this.userRepository.findAll({filter:{category:UserCategory.ADMIN}}); }
+        catch (error) { throw (error); }
+    }
 
     async createUser(user: User) {
         try {
@@ -36,7 +41,7 @@ export class UsersService extends BaseService<User> {
 
             if (!isEmpty(existingUsername)) { throw new Error(errorMsg.USERNAME_USED); }
 
-            const password = '123';
+            const password = CommonService.getRandomString(8);
 
             user.password = await hash(password, config.get('saltRounds'));
 
@@ -44,8 +49,10 @@ export class UsersService extends BaseService<User> {
 
             user.dates = { created: moment().valueOf() };
 
+            user.enabled = true;
+
             const result = await this.userRepository.create(user as any);
-            // await this.notificationsService.sendEmailNotification(email, TemplateLabel.ADMIN_CREATED_TO_USER, { user, password });
+            await this.notificationsService.sendEmailNotification(email, TemplateLabel.ADMIN_CREATED_TO_USER, { user, password });
             const data = { _id: result.insertedId };
             return data;
         }

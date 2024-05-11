@@ -1,19 +1,22 @@
-import { BaseService, errorMsg, respMsg } from "common";
+import { BaseService, errorMsg } from "common";
 import { Service } from "typedi";
 import { RequestRepository } from "./request.repository";
 import { Request, RequestStatus } from "./models";
 import { isEmpty } from "lodash";
 import httpContext from 'express-http-context';
-import { User, UserCategory } from "..";
+import { User, UserCategory, UsersService } from "..";
 import { UsersRepository } from "modules/users/users.repository";
 import moment from "moment";
+import { NotificationsService, TemplateLabel } from "modules/notifications";
 
 
 @Service()
 export class RequestService extends BaseService<Request> {
 
     constructor(private readonly requestRepository: RequestRepository,
-        private readonly userRepository: UsersRepository) {
+        private readonly userRepository: UsersRepository,
+        private readonly notificationsService: NotificationsService,
+        private usersService: UsersService) {
         super(requestRepository);
     }
 
@@ -21,7 +24,7 @@ export class RequestService extends BaseService<Request> {
         try {
             const { name, files } = request;
 
-            const user = httpContext.get('user') as User;
+            const user = httpContext.get('user');
 
             const { email, _id, fname, lname, username, tel } = user;
             const existingName = await this.requestRepository.findOne({ filter: { name, 'user._id': _id } });
@@ -36,7 +39,6 @@ export class RequestService extends BaseService<Request> {
                 fullName: `${fname} ${lname}`
             }
             if (files) {
-
                 request.attachements = files?.map((file) => {
                     return {
                         path: file.path,
@@ -51,6 +53,14 @@ export class RequestService extends BaseService<Request> {
             request.status = RequestStatus.INITIATED;
             request.code = generateCode(username);
             const result = await this.create(request);
+            
+            await this.notificationsService.sendEmailNotification(email, TemplateLabel.REQUEST_INITIATED_TO_USER, { fname, lname });
+            const admins = await this.usersService.getAdminUsers();
+            if(!isEmpty(admins)){
+                await Promise.all(admins.map((admin)=> {
+                this.notificationsService.sendEmailNotification(admin?.email, TemplateLabel.REQUEST_INITIATED_TO_ADMIN, { fname: admin?.fname, lname: admin?.lname,request });
+                }));
+            }
             return result;
         }
         catch (error) { throw (error); }
@@ -110,8 +120,21 @@ export class RequestService extends BaseService<Request> {
             });
 
             const response = await this.update({ code }, { status, updateData, ...addData })
+            const {fullName,email} = request?.user;
+            const templateUserLabel = getNotificationMapping(status)
+            const templateAdminLabel = getNotificationMapping(status,true)
+            if (templateUserLabel) {
+                await this.notificationsService.sendEmailNotification(email, templateUserLabel, { fullName, request: {...request, ...addData }});
+            }
 
-            //TODO send notification
+            if (templateAdminLabel) {
+                const admins = await this.usersService.getAdminUsers();
+                if(!isEmpty(admins)){
+                    await Promise.all(admins.map((admin)=> {
+                    this.notificationsService.sendEmailNotification(admin?.email, templateAdminLabel, { fname: admin?.fname, lname: admin?.lname,request });
+                    }));
+                }
+            }
 
             return response;
 
@@ -119,7 +142,26 @@ export class RequestService extends BaseService<Request> {
         catch (error) { throw (error); }
     }
 
+    async countRequest(query: any) {
+        try {
+            const authUser = httpContext.get('user');
+            const { _id } = authUser;
 
+            const user = await this.userRepository.findById(_id) as unknown as User;
+
+            const { category } = user;
+
+            if (category === UserCategory.ADMIN) {
+                return await this.count(query);
+            }
+            else {
+                query = { ...query, 'user._id': _id }
+                return await this.count(query);
+            }
+        }
+
+        catch (error) { throw (error); }
+    }
     async findRequest(query: any) {
         try {
             const authUser = httpContext.get('user');
@@ -166,7 +208,6 @@ export class RequestService extends BaseService<Request> {
             delete request.files;
 
             const response = await this.update({ code }, { deliverables: { links, attachements } })
-
             //TODO send notification
 
             return response;
@@ -181,4 +222,20 @@ function generateCode(username: string) {
     const timestamp = now.getTime();
     const code = username.substring(0, 2).toUpperCase() + timestamp.toString().substring(timestamp.toString().length - 6);
     return code;
+}
+
+function getNotificationMapping(status: RequestStatus, admin?: boolean){
+   const mappingAdmin: any = {
+    300: TemplateLabel.REQUEST_CANCELED_TO_ADMIN,
+   }
+
+   const mappingUser: any = {
+    200: TemplateLabel.REQUEST_VALIDATED_TO_USER,
+    300: TemplateLabel.REQUEST_CANCELED_TO_USER,
+    400:TemplateLabel.REQUEST_REJECTED_TO_USER,
+    500:TemplateLabel.REQUEST_PAID_TO_USER,
+    600:TemplateLabel.REQUEST_CLOSED_TO_USER,
+   }
+
+   return admin ? mappingAdmin[status] : mappingUser[status];
 }

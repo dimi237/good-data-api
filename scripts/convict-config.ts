@@ -75,6 +75,20 @@ export const config = convict({
         format: String,
         default: ''
     },
+    app: {
+        url: {
+            doc: 'App url',
+            format: '*',
+            default: 'http://localhost:4200',
+            env: 'APP_URL'
+        },
+        logo: {
+            doc: 'App logo',
+            format: '*',
+            default: '',
+            env: 'APP_LOGO'
+        },
+    },
 
     db: {
         host: {

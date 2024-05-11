@@ -31,6 +31,8 @@ export  function authVerification(req: Request, res: Response, next: NextFunctio
         delete payloadata.exp;
         delete payloadata.iat;
         const user = payloadata.payload;
+        httpContext.ns.bindEmitter(req);
+        httpContext.ns.bindEmitter(res);
         httpContext.set('user', user);
 
         return next();

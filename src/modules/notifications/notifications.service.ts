@@ -6,13 +6,13 @@ import readFilePromise from 'fs-readfile-promise';
 import handlebars from "handlebars";
 import { templates } from "./data/templates";
 import { errorMsg } from "common/utils";
+import config from "convict-config";
 
 
 @Service()
 export class NotificationsService {
     templateHtml: any;
     constructor(private readonly channelService: ChannelService) {
-
         (async () => {
             this.templateHtml = await readFilePromise(__dirname + '/templates/mail.template.html', 'utf8');
         })();
@@ -66,7 +66,7 @@ export class NotificationsService {
 
             const { subject } = templateData;
 
-            const body = templateData.getBody(info);
+            const body = templateData.getBody({...info, link:config.get('app.url'),logo:config.get('app.logo')});
 
             const html = this.prepareTemplate({ subject, body });
 

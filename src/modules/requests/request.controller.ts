@@ -16,12 +16,15 @@ export class RequestController extends BaseController<RequestModel> {
         try { res.send(await this.service.createRequest({ ...req.body, files: req.files })); }
         catch (error) { next(error); }
     }
+    async count(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try { res.send(await this.service.countRequest(req.params)); }
+        catch (error) { next(error); }
+    }
 
     async findAll(req: Request, res: Response, next: NextFunction): Promise<void> {
         try { res.send(await this.service.findRequest({ filter: req.query })); }
         catch (error) { next(error); }
     }
-
 
     async updateRequestStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
         try { res.send(await this.service.updateRequestStatus(req.params.code, req.body)); }

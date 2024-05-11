@@ -73,11 +73,10 @@ export abstract class BaseService<T extends BaseModel> implements ServiceInterfa
     } catch (error) { throw error; }
   }
 
-  async count(query: QueryFilter): Promise<number> {
+  async count(query: QueryFilter): Promise<any> {
     try {
       const numberOfDocuments = await this.repository.count(query);
-
-      return numberOfDocuments;
+      return {count: numberOfDocuments};
     } catch (error) { throw error; }
   }
 
