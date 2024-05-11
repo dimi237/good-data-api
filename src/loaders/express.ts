@@ -38,7 +38,7 @@ export class ExpressLoader {
         app.use(json({ limit: "20mb" }));
 
         // enabling CORS for all requests
-        app.use(cors({}));
+        // app.use(cors({}));
 
         app.use(bodyParser.json()); //must come before
 
