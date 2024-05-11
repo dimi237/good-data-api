@@ -18,7 +18,9 @@ export const config = convict({
     host: {
         doc: 'Application host.',
         format: '*',
-        default: 'localhost',
+        default: '0.0.0.0',
+        env: 'HOST',
+
     },
     tokenSalt: {
         doc: 'Salt to encrypt tokens.',
