@@ -1,29 +1,37 @@
-FROM node:20-buster-slim
+FROM node:16-alpine
 
-USER root
+COPY package*.json /tmp/
 
-# Expose the port the app runs in
+RUN cd /tmp && npm install --omit=dev --unsafe-perm=true && npm i -g typescript && npm i ts-node --save-dev
+
+COPY tsconfig.json /tmp/
+
+COPY src /tmp/src
+
+COPY scripts /tmp/scripts
+
+RUN cd /tmp && tsc -p . 
+
+
+
+FROM node:16-alpine
+
+RUN mkdir -p /usr/src/good-data-api 
+
+COPY --from=0 /tmp/package*.json /usr/src/good-data-api/
+
+COPY --from=0 /tmp/node_modules /usr/src/good-data-api/node_modules
+
+COPY --from=0 /tmp/dist /usr/src/good-data-api/
+
+COPY src/envs /usr/src/good-data-api/src/envs
+
+RUN mkdir -p /usr/src/good-data-api/uploads
+
+COPY src/modules/notifications/templates /usr/src/good-data-api/src/modules/notifications/templates
+
+WORKDIR  /usr/src/good-data-api
+
 EXPOSE 3000
 
-# RUN npm install pm2 -g
-
-ENV NODE_PATH=/usr/lib/node_modules
-
-# Create a directory where our app will be placed
-RUN mkdir -p /usr/src/good-data
-
-# Change directory so that our commands run inside this new directory
-WORKDIR /usr/src/good-data
-
-# Copy dependency definitions
-ADD package.json /usr/src/good-data
-
-# Install dependecies
-RUN npm install -g typescript ts-node
-RUN npm install --unsafe-perm=true
-
-# Get all the code needed to run the app
-ADD . /usr/src/good-data
-
-# RUN NODE_ENV=staging-bci
-CMD npm run start:staging
+CMD ["npm", "run", "start:prod"]
