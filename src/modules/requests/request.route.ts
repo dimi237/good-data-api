@@ -16,6 +16,7 @@ export class RequestRouter extends BaseRouter<RequestController, Request> {
         const router = this.getRouter(middleware);
         router.put('/:code/status', middleware, (req: any, res: any, next: any) => this.controller.updateRequestStatus(req, res, next));
         router.put('/:code/admin', middleware, (req: any, res: any, next: any) => this.controller.updateRequestByAdmin(req, res, next));
+        router.get('/charts/count', middleware, (req: any, res: any, next: any) => this.controller.getRequestChart(req, res, next));
         return router;
     }
 

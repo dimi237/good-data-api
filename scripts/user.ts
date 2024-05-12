@@ -20,8 +20,6 @@ import config from './convict-config';
 	},
 	]
 	try {
-	  
-
 		if (isEmpty(users)) { return; }
 
 		const result = await db.collection('users').insertMany(users);
@@ -34,6 +32,4 @@ import config from './convict-config';
 	} finally {
 		process.exit();
 	}
-
-
 })()

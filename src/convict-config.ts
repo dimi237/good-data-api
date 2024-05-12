@@ -115,6 +115,21 @@ export const config = convict({
         },
 
     },
+    storage: {
+        host: {
+            doc: 'storage host ',
+            format: '*',
+            default: '',
+            env: 'STORAGE_HOST'
+        },
+
+        secret: {
+            doc: 'storage secret',
+            format: '*',
+            default: '',
+            env: 'STORAGE_SECRET'
+        },
+    },
     amqp: {
         host: {
             doc: 'amqp host name/IP',

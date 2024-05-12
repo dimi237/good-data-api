@@ -215,6 +215,24 @@ export class RequestService extends BaseService<Request> {
         catch (error) { throw (error); }
     }
 
+    async getRequestChart() {
+        try {
+            const authUser = httpContext.get('user');
+            const { _id } = authUser;
+
+            const user = await this.userRepository.findById(_id) as unknown as User;
+
+            const { category } = user;
+
+            const query = category === UserCategory.USER ?{ 'user._id':_id}  :{};
+            const countClosed= await this.count({ ...query, status: RequestStatus.CLOSED  });
+            const countCanceled = await this.count({ ...query, status: RequestStatus.CANCELED  });
+            const countPending =  await this.count({ ...query, status:{$in: [RequestStatus.INITIATED, RequestStatus.PAID, RequestStatus.VALIDATED, RequestStatus.REJECTED]}  });
+            return [countClosed?.count || 0,countCanceled?.count || 0,countPending?.count || 0];
+        }
+        catch (error) { throw (error); }
+    }
+
 }
 
 function generateCode(username: string) {

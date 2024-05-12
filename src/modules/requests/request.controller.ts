@@ -35,4 +35,9 @@ export class RequestController extends BaseController<RequestModel> {
         try { res.send(await this.service.updateRequestByAdmin(req.params.code, { ...req.body, files: req.files })); }
         catch (error) { next(error); }
     }
+
+    async getRequestChart(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try { res.send(await this.service.getRequestChart(req.params)); }
+        catch (error) { next(error); }
+    }
 }
