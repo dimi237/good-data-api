@@ -122,12 +122,23 @@ export const config = convict({
             default: '',
             env: 'STORAGE_HOST'
         },
-
         secret: {
             doc: 'storage secret',
             format: '*',
             default: '',
             env: 'STORAGE_SECRET'
+        },
+        access: {
+            doc: 'storage access',
+            format: '*',
+            default: '',
+            env: 'STORAGE_ACCESS'
+        },
+        bucket: {
+            doc: 'storage bucket',
+            format: '*',
+            default: '',
+            env: 'STORAGE_BUCKET'
         },
     },
     amqp: {

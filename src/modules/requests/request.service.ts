@@ -1,13 +1,14 @@
 import { BaseService, errorMsg } from "common";
 import { Service } from "typedi";
 import { RequestRepository } from "./request.repository";
-import { Request, RequestStatus } from "./models";
+import { Attachement, Request, RequestStatus } from "./models";
 import { isEmpty } from "lodash";
 import httpContext from 'express-http-context';
 import { User, UserCategory, UsersService } from "..";
 import { UsersRepository } from "modules/users/users.repository";
 import moment from "moment";
 import { NotificationsService, TemplateLabel } from "modules/notifications";
+import { StorageService } from "modules/storage/storage.service";
 
 
 @Service()
@@ -16,6 +17,7 @@ export class RequestService extends BaseService<Request> {
     constructor(private readonly requestRepository: RequestRepository,
         private readonly userRepository: UsersRepository,
         private readonly notificationsService: NotificationsService,
+        private readonly storageService: StorageService,
         private usersService: UsersService) {
         super(requestRepository);
     }
@@ -61,6 +63,8 @@ export class RequestService extends BaseService<Request> {
                 this.notificationsService.sendEmailNotification(admin?.email, TemplateLabel.REQUEST_INITIATED_TO_ADMIN, { fname: admin?.fname, lname: admin?.lname,request });
                 }));
             }
+
+            this.uploadManyRequestFiles(result.data, request.attachements || []);
             return result;
         }
         catch (error) { throw (error); }
@@ -210,6 +214,8 @@ export class RequestService extends BaseService<Request> {
             const response = await this.update({ code }, { deliverables: { links, attachements } })
             //TODO send notification
 
+            this.uploadManyRequestFiles(request._id.toString(), request.attachements || [], true);
+
             return response;
         }
         catch (error) { throw (error); }
@@ -229,6 +235,24 @@ export class RequestService extends BaseService<Request> {
             const countCanceled = await this.count({ ...query, status: RequestStatus.CANCELED  });
             const countPending =  await this.count({ ...query, status:{$in: [RequestStatus.INITIATED, RequestStatus.PAID, RequestStatus.VALIDATED, RequestStatus.REJECTED]}  });
             return [countClosed?.count || 0,countCanceled?.count || 0,countPending?.count || 0];
+        }
+        catch (error) { throw (error); }
+    }
+
+     async uploadManyRequestFiles(_id:string, attachements: Attachement[], isDelivrable?:boolean) {
+        try {  
+          
+            const newAttachements = await Promise.all(
+                attachements.map(async (elt)=>{
+                    if (!elt.uploaded && elt.fileName && elt.path) {
+                        const data = await this.storageService.uploadFile(elt.fileName, elt.path);
+                        return {...elt, path: data.Location}
+                    }
+                    return elt; 
+                })
+            )
+
+            return isDelivrable ? this.update({_id}, {'deliverables.attachements':newAttachements}): this.update({_id}, {attachements:newAttachements})
         }
         catch (error) { throw (error); }
     }

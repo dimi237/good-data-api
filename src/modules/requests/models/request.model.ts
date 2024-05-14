@@ -39,6 +39,7 @@ export interface Attachement {
     path?: string;
     fileName?: string;
     contenType?: string;
+    uploaded?: boolean;
 }
 
 

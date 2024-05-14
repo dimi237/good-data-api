@@ -7,6 +7,8 @@ import handlebars from "handlebars";
 import { templates } from "./data/templates";
 import { errorMsg } from "common/utils";
 import config from "convict-config";
+import { logger } from "winston-config";
+import { get, max } from "lodash";
 
 
 @Service()
@@ -87,6 +89,7 @@ export class NotificationsService {
     private async sendToqueue(queue: string, data: Notification | BulkNotifications) {
         data.status = 'PENDING';
         await this.channelService.sendToqueue(queue, data);
+        logger.info(`Message  send to ${queue} queue data: ${get(data, 'email') || get(data, 'tel') || 'bulk' }`);
         return {
             message: 'Sent to queue',
             status: data.status

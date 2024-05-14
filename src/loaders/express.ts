@@ -45,7 +45,7 @@ export class ExpressLoader {
         
         // Apply middlewares
         app.use(httpContext.middleware);
-        app.use(authVerification);
+        // app.use(authVerification);
 
         // Pass app to routes
         routes(app);

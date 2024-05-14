@@ -40,4 +40,9 @@ export class RequestController extends BaseController<RequestModel> {
         try { res.send(await this.service.getRequestChart(req.params)); }
         catch (error) { next(error); }
     }
+
+    async upload(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try { res.send(await this.service.uploadManyRequestFiles(req.params)); }
+        catch (error) { next(error); }
+    }
 }

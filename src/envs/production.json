@@ -18,5 +18,11 @@
     "amqp": {
         "host": "amqp://localhost",
         "secret": "fe@c/VW'4mK)6Gtd"
+    },
+    "storage": {
+        "host": "https://fr-par-1.linodeobjects.com",
+        "secret": "I05RNh9RfUMuIubRlk3TT0ITBCij4xvjz8nPgnPb",
+        "access": "KMIWV4MJO4N2065C6CPE",
+        "bucket": "gooddata"
     }
 }
