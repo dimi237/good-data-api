@@ -11,23 +11,22 @@ export class RequestController extends BaseController<RequestModel> {
     constructor(service: RequestService) {
         super(service);
     }
-
     async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try { res.send(await this.service.createRequest({ ...req.body, files: req.files })); }
+        try { res.send(await this.service.createRequest(req.headers.email, { ...req.body, files: req.files })); }
         catch (error) { next(error); }
     }
     async count(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try { res.send(await this.service.countRequest(req.params)); }
+        try { res.send(await this.service.countRequest(req.headers.email,req.params)); }
         catch (error) { next(error); }
     }
 
     async findAll(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try { res.send(await this.service.findRequest({ filter: req.query })); }
+        try { res.send(await this.service.findRequest(req.headers.email,{ filter: req.query })); }
         catch (error) { next(error); }
     }
 
     async updateRequestStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try { res.send(await this.service.updateRequestStatus(req.params.code, req.body)); }
+        try { res.send(await this.service.updateRequestStatus(req.headers.email,req.params.code, req.body)); }
         catch (error) { next(error); }
     }
 
@@ -37,7 +36,7 @@ export class RequestController extends BaseController<RequestModel> {
     }
 
     async getRequestChart(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try { res.send(await this.service.getRequestChart(req.params)); }
+        try { res.send(await this.service.getRequestChart(req.headers.email,req.params)); }
         catch (error) { next(error); }
     }
 

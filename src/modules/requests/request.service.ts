@@ -3,9 +3,7 @@ import { Service } from "typedi";
 import { RequestRepository } from "./request.repository";
 import { Attachement, Request, RequestStatus } from "./models";
 import { isEmpty } from "lodash";
-import httpContext from 'express-http-context';
-import { User, UserCategory, UsersService } from "..";
-import { UsersRepository } from "modules/users/users.repository";
+import {  UserCategory, UsersService } from "..";
 import moment from "moment";
 import { NotificationsService, TemplateLabel } from "modules/notifications";
 import { StorageService } from "modules/storage/storage.service";
@@ -15,26 +13,26 @@ import { StorageService } from "modules/storage/storage.service";
 export class RequestService extends BaseService<Request> {
 
     constructor(private readonly requestRepository: RequestRepository,
-        private readonly userRepository: UsersRepository,
         private readonly notificationsService: NotificationsService,
         private readonly storageService: StorageService,
         private usersService: UsersService) {
         super(requestRepository);
     }
 
-    async createRequest(request: Request) {
+    async createRequest(email: string, request: Request) {
         try {
             const { name, files } = request;
 
-            const user = httpContext.get('user');
+            const user = await this.usersService.findOne({filter:{email}});
 
-            const { email, _id, fname, lname, username, tel } = user;
-            const existingName = await this.requestRepository.findOne({ filter: { name, 'user._id': _id } });
+            const { _id, fname, lname, username, tel } = user;
+
+            const existingName = await this.requestRepository.findOne({ filter: { name, 'user._id': _id.toString()} });
 
             if (!isEmpty(existingName)) { throw new Error(errorMsg.NAME_USED); }
 
             request.user = {
-                _id,
+                _id:_id.toString() ,
                 username,
                 tel,
                 email,
@@ -69,7 +67,7 @@ export class RequestService extends BaseService<Request> {
         }
         catch (error) { throw (error); }
     }
-    async updateRequestStatus(code: string, data: any) {
+    async updateRequestStatus(email:string, code: string, data: any) {
         try {
             const { status } = data;
 
@@ -96,7 +94,7 @@ export class RequestService extends BaseService<Request> {
 
             if (!request) { throw new Error(errorMsg.NOT_FOUND) }
 
-            const user = httpContext.get('user') as User;
+            const user = await this.usersService.findOne({filter:{email}});
 
             const isAuthorized = mapping[user.category][request.status || 100].includes(status as never)
 
@@ -124,7 +122,7 @@ export class RequestService extends BaseService<Request> {
             });
 
             const response = await this.update({ code }, { status, updateData, ...addData })
-            const {fullName,email} = request?.user;
+            const {fullName} = request?.user;
             const templateUserLabel = getNotificationMapping(status)
             const templateAdminLabel = getNotificationMapping(status,true)
             if (templateUserLabel) {
@@ -146,32 +144,28 @@ export class RequestService extends BaseService<Request> {
         catch (error) { throw (error); }
     }
 
-    async countRequest(query: any) {
+    async countRequest(email: string, query: any) {
         try {
-            const authUser = httpContext.get('user');
-            const { _id } = authUser;
-
-            const user = await this.userRepository.findById(_id) as unknown as User;
-
+            const user = await this.usersService.findOne({filter:{email}});
+            const { _id } = user;
             const { category } = user;
 
             if (category === UserCategory.ADMIN) {
                 return await this.count(query);
             }
             else {
-                query = { ...query, 'user._id': _id }
+                query = { ...query, 'user._id': _id.toString() }
                 return await this.count(query);
             }
         }
 
         catch (error) { throw (error); }
     }
-    async findRequest(query: any) {
+    async findRequest(email:string, query: any) {
         try {
-            const authUser = httpContext.get('user');
-            const { _id } = authUser;
+            const user = await this.usersService.findOne({filter:{email}});
 
-            const user = await this.userRepository.findById(_id) as unknown as User;
+            const { _id } = user;
 
             const { category } = user;
 
@@ -179,7 +173,7 @@ export class RequestService extends BaseService<Request> {
                 return await this.findAll(query);
             }
             else {
-                query.filter = { ...query.filter, 'user._id': _id }
+                query.filter = { ...query.filter, 'user._id': _id.toString() }
                 return await this.findAll(query);
             }
         }
@@ -221,16 +215,15 @@ export class RequestService extends BaseService<Request> {
         catch (error) { throw (error); }
     }
 
-    async getRequestChart() {
+    async getRequestChart(email:string) {
         try {
-            const authUser = httpContext.get('user');
-            const { _id } = authUser;
+            const user = await this.usersService.findOne({filter:{email}});
+            const { _id } = user;
 
-            const user = await this.userRepository.findById(_id) as unknown as User;
 
             const { category } = user;
 
-            const query = category === UserCategory.USER ?{ 'user._id':_id}  :{};
+            const query = category === UserCategory.USER ?{ 'user._id':_id.toString()}  :{};
             const countClosed= await this.count({ ...query, status: RequestStatus.CLOSED  });
             const countCanceled = await this.count({ ...query, status: RequestStatus.CANCELED  });
             const countPending =  await this.count({ ...query, status:{$in: [RequestStatus.INITIATED, RequestStatus.PAID, RequestStatus.VALIDATED, RequestStatus.REJECTED]}  });
@@ -239,7 +232,7 @@ export class RequestService extends BaseService<Request> {
         catch (error) { throw (error); }
     }
 
-     async uploadManyRequestFiles(_id:string, attachements: Attachement[], isDelivrable?:boolean) {
+     private async uploadManyRequestFiles(_id:string, attachements: Attachement[], isDelivrable?:boolean) {
         try {  
           
             const newAttachements = await Promise.all(
