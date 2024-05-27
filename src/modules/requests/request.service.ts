@@ -208,7 +208,7 @@ export class RequestService extends BaseService<Request> {
             const response = await this.update({ code }, { deliverables: { links, attachements } })
             //TODO send notification
 
-            this.uploadManyRequestFiles(request._id.toString(), request.attachements || [], true);
+            this.uploadManyRequestFiles(request._id.toString(), attachements || [], true);
 
             return response;
         }
@@ -227,7 +227,7 @@ export class RequestService extends BaseService<Request> {
             const countClosed= await this.count({ ...query, status: RequestStatus.CLOSED  });
             const countCanceled = await this.count({ ...query, status: RequestStatus.CANCELED  });
             const countPending =  await this.count({ ...query, status:{$in: [RequestStatus.INITIATED, RequestStatus.PAID, RequestStatus.VALIDATED, RequestStatus.REJECTED]}  });
-            return [countClosed?.count || 0,countCanceled?.count || 0,countPending?.count || 0];
+            return [countPending?.count || 0, countClosed?.count || 0,countCanceled?.count || 0];
         }
         catch (error) { throw (error); }
     }

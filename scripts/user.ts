@@ -18,6 +18,17 @@ import config from './convict-config';
 		enabled: true, 
 		dates: { created: moment().valueOf(), updated: null } 
 	},
+	{ 
+		username: "ADMIN002",
+		fname: "Willy",
+		lname: "Tchamo",
+		email: "willytchamo@gmail.com",
+		tel: "",
+		password: await hash('goodData2024', config.get('saltRounds')),
+		category: 100,
+		enabled: true, 
+		dates: { created: moment().valueOf(), updated: null } 
+	},
 	]
 	try {
 		if (isEmpty(users)) { return; }

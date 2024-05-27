@@ -30,7 +30,7 @@ export class UsersService extends BaseService<User> {
 
     async createUser(user: User) {
         try {
-            const { email, username } = user;
+            const { email, username,password } = user;
 
             delete user._id;
             const existing = await this.userRepository.findOne({ filter: { email } });
@@ -41,7 +41,7 @@ export class UsersService extends BaseService<User> {
 
             if (!isEmpty(existingUsername)) { throw new Error(errorMsg.USERNAME_USED); }
 
-            const password = CommonService.getRandomString(8);
+            // const password = CommonService.getRandomString(8);
 
             user.password = await hash(password, config.get('saltRounds'));
 

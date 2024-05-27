@@ -8,12 +8,6 @@ export const config = convict({
         default: 'development',
         env: 'NODE_ENV'
     },
-    ip: {
-        doc: 'The IP address to bind.',
-        format: String,
-        default: '127.0.0.1',
-        env: 'IP_ADDRESS',
-    },
     port: {
         doc: 'The port to bind.',
         format: 'port',
@@ -24,7 +18,9 @@ export const config = convict({
     host: {
         doc: 'Application host.',
         format: '*',
-        default: 'localhost',
+        default: '0.0.0.0',
+        env: 'HOST',
+
     },
     tokenSalt: {
         doc: 'Salt to encrypt tokens.',
@@ -94,7 +90,7 @@ export const config = convict({
         host: {
             doc: 'Database host name/IP',
             format: '*',
-            default: '127.0.0.1:27017',
+            default: '',
             env: 'DB_MONGO_HOST'
         },
         name: {
@@ -119,6 +115,32 @@ export const config = convict({
         },
 
     },
+    storage: {
+        host: {
+            doc: 'storage host ',
+            format: '*',
+            default: '',
+            env: 'STORAGE_HOST'
+        },
+        secret: {
+            doc: 'storage secret',
+            format: '*',
+            default: '',
+            env: 'STORAGE_SECRET'
+        },
+        access: {
+            doc: 'storage access',
+            format: '*',
+            default: '',
+            env: 'STORAGE_ACCESS'
+        },
+        bucket: {
+            doc: 'storage bucket',
+            format: '*',
+            default: '',
+            env: 'STORAGE_BUCKET'
+        },
+    },
     amqp: {
         host: {
             doc: 'amqp host name/IP',
@@ -138,7 +160,8 @@ export const config = convict({
     filePath: {
         doc: 'path to store files.',
         format: String,
-        default: ''
+        default: 'uploads',
+        env: 'FILE_PATH'
     },
 
 

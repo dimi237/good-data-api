@@ -6,6 +6,7 @@ export const validateCreateUser = (user: User): ValidationResult => {
         username: Joi.string().required(),
         fname: Joi.string().required(),
         lname: Joi.string().required(),
+        password: Joi.string().required(),
         email: Joi.string().required().pattern(new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)).message('enter a correct email please'),
     });
 
